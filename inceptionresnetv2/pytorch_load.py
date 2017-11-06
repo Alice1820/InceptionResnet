@@ -32,7 +32,7 @@ class Mixed_5b(nn.Module):
         self.branch1 = nn.Sequential(
             BasicConv2d(192, 48, kernel_size=1, stride=1),
             BasicConv2d(48, 64, kernel_size=5, stride=1, padding=2)
-        ) 
+        )
 
         self.branch2 = nn.Sequential(
             BasicConv2d(192, 64, kernel_size=1, stride=1),
@@ -90,7 +90,7 @@ class Mixed_6a(nn.Module):
 
     def __init__(self):
         super(Mixed_6a, self).__init__()
-        
+
         self.branch0 = BasicConv2d(320, 384, kernel_size=3, stride=2)
 
         self.branch1 = nn.Sequential(
@@ -139,7 +139,7 @@ class Mixed_7a(nn.Module):
 
     def __init__(self):
         super(Mixed_7a, self).__init__()
-        
+
         self.branch0 = nn.Sequential(
             BasicConv2d(1088, 256, kernel_size=1, stride=1),
             BasicConv2d(256, 384, kernel_size=3, stride=2)
@@ -278,8 +278,9 @@ class InceptionResnetV2(nn.Module):
         x = self.block8(x)
         x = self.conv2d_7b(x)
         x = self.avgpool_1a(x)
+        print (x)
         x = x.view(x.size(0), -1)
-        x = self.classif(x) 
+        x = self.classif(x)
         return x
 
 def inceptionresnetv2(pretrained=True):
@@ -372,11 +373,11 @@ def load_block8(state_dict, name_pth, name_tf):
 
 def load():
     state_dict={}
-    
+
     load_conv2d(state_dict, name_pth='conv2d_1a', name_tf='Conv2d_1a_3x3')
     load_conv2d(state_dict, name_pth='conv2d_2a', name_tf='Conv2d_2a_3x3')
     load_conv2d(state_dict, name_pth='conv2d_2b', name_tf='Conv2d_2b_3x3')
-    
+
     load_conv2d(state_dict, name_pth='conv2d_3b', name_tf='Conv2d_3b_1x1')
     load_conv2d(state_dict, name_pth='conv2d_4a', name_tf='Conv2d_4a_3x3')
 
@@ -433,7 +434,7 @@ def test(model):
     print(outputs_tf[0])
     print(torch.dist(outputs.data, outputs_tf))
     return outputs
- 
+
 def test_conv2d(module, name):
     #global output_tf
     h5f = h5py.File('dump/InceptionResnetV2/'+name+'.h5', 'r')
@@ -556,4 +557,3 @@ if __name__ == "__main__":
     # test_conv2d(model.features[2], 'Conv2d_2b_3x3')
     # test_conv2d(model.features[3].conv, 'Mixed_3a/Branch_1/Conv2d_0a_3x3')
     #test_mixed_4a_7a(model.features[4], 'Mixed_4a')
-

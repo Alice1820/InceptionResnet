@@ -112,7 +112,7 @@ class Reduction_A(nn.Module):
             BasicConv2d(192, 224, kernel_size=3, stride=1, padding=1),
             BasicConv2d(224, 256, kernel_size=3, stride=2)
         )
-        
+
         self.branch2 = nn.MaxPool2d(3, stride=2)
 
     def forward(self, x):
@@ -127,7 +127,7 @@ class Inception_B(nn.Module):
     def __init__(self):
         super(Inception_B, self).__init__()
         self.branch0 = BasicConv2d(1024, 384, kernel_size=1, stride=1)
-        
+
         self.branch1 = nn.Sequential(
             BasicConv2d(1024, 192, kernel_size=1, stride=1),
             BasicConv2d(192, 224, kernel_size=(1,7), stride=1, padding=(0,3)),
@@ -187,17 +187,17 @@ class Inception_C(nn.Module):
         super(Inception_C, self).__init__()
 
         self.branch0 = BasicConv2d(1536, 256, kernel_size=1, stride=1)
-        
+
         self.branch1_0 = BasicConv2d(1536, 384, kernel_size=1, stride=1)
         self.branch1_1a = BasicConv2d(384, 256, kernel_size=(1,3), stride=1, padding=(0,1))
         self.branch1_1b = BasicConv2d(384, 256, kernel_size=(3,1), stride=1, padding=(1,0))
-        
+
         self.branch2_0 = BasicConv2d(1536, 384, kernel_size=1, stride=1)
         self.branch2_1 = BasicConv2d(384, 448, kernel_size=(3,1), stride=1, padding=(1,0))
         self.branch2_2 = BasicConv2d(448, 512, kernel_size=(1,3), stride=1, padding=(0,1))
         self.branch2_3a = BasicConv2d(512, 256, kernel_size=(1,3), stride=1, padding=(0,1))
         self.branch2_3b = BasicConv2d(512, 256, kernel_size=(3,1), stride=1, padding=(1,0))
-        
+
         self.branch3 = nn.Sequential(
             nn.AvgPool2d(3, stride=1, padding=1, count_include_pad=False),
             BasicConv2d(1536, 256, kernel_size=1, stride=1)
@@ -205,7 +205,7 @@ class Inception_C(nn.Module):
 
     def forward(self, x):
         x0 = self.branch0(x)
-        
+
         x1_0 = self.branch1_0(x)
         x1_1a = self.branch1_1a(x1_0)
         x1_1b = self.branch1_1b(x1_0)
@@ -256,8 +256,10 @@ class InceptionV4(nn.Module):
 
     def forward(self, x):
         x = self.features(x)
+        print (x)
+        '''flatten'''
         x = x.view(x.size(0), -1)
-        x = self.classif(x) 
+        x = self.classif(x)
         return x
 
 def inceptionv4(pretrained=True):
@@ -330,11 +332,11 @@ def load_mixed_7(state_dict, name_pth, name_tf):
 
 def load():
     state_dict={}
-    
+
     load_conv2d(state_dict, name_pth='features.0', name_tf='Conv2d_1a_3x3')
     load_conv2d(state_dict, name_pth='features.1', name_tf='Conv2d_2a_3x3')
     load_conv2d(state_dict, name_pth='features.2', name_tf='Conv2d_2b_3x3')
-    
+
     load_conv2d(state_dict, name_pth='features.3.conv', name_tf='Mixed_3a/Branch_1/Conv2d_0a_3x3')
 
     load_mixed_4a_7a(state_dict, name_pth='features.4', name_tf='Mixed_4a')
@@ -389,7 +391,7 @@ def test(model):
     outputs = torch.nn.functional.softmax(outputs)
     print(torch.dist(outputs.data, outputs_tf))
     return outputs
- 
+
 def test_conv2d(module, name):
     #global output_tf
     h5f = h5py.File('dump/InceptionV4/'+name+'.h5', 'r')
@@ -426,11 +428,9 @@ if __name__ == "__main__":
     # test_conv2d(model.features[2], 'Conv2d_2b_3x3')
     # test_conv2d(model.features[3].conv, 'Mixed_3a/Branch_1/Conv2d_0a_3x3')
     # test_mixed_4a_7a(model.features[4], 'Mixed_4a')
-    
+
     os.system('mkdir -p save')
     torch.save(model, 'save/inceptionv4.pth')
     torch.save(state_dict, 'save/inceptionv4_state.pth')
 
     outputs = test(model)
-
-
